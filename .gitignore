@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -137,3 +138,19 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+=======
+# Środowisko wirtualne
+venv/
+ENV/
+
+# Cache Pythona
+**/__pycache__/
+*.py[cod]
+
+# Baza danych (lokalna)
+db.sqlite3
+
+# Pliki IDE
+.vscode/
+.idea/
+>>>>>>> 9ab8dc5 (Initial commit: Django project structure)
