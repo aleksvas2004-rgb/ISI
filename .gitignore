@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -139,6 +140,8 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 =======
+=======
+>>>>>>> feature/initial-setup
 # Środowisko wirtualne
 venv/
 ENV/
@@ -152,5 +155,9 @@ db.sqlite3
 
 # Pliki IDE
 .vscode/
+<<<<<<< HEAD
 .idea/
 >>>>>>> 9ab8dc5 (Initial commit: Django project structure)
+=======
+.idea/
+>>>>>>> feature/initial-setup
