@@ -6,4 +6,8 @@ urlpatterns = [
         "weather/",
         views.weather_view
     ),
+    path(
+        "posts/",
+        views.posts_view
+    )
 ]

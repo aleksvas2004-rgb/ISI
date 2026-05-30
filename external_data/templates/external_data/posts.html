@@ -1,0 +1,10 @@
+<h1>Statystyki</h1>
+
+<ul>
+{% for user, count in stats %}
+    <li>
+        Użytkownik {{ user }}
+        napisał {{ count }} postów
+    </li>
+{% endfor %}
+</ul>

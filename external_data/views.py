@@ -3,6 +3,8 @@ from django.shortcuts import render
 
 import os
 
+from .services.jsonplaceholder_service import posts_per_user
+
 from .services.weather_service import (
     get_weather,
     generate_chart,
@@ -39,5 +41,16 @@ def weather_view(request):
                 weather["current_temperature"],
             "chart":
                 "/media/weather_chart.png"
+        }
+    )
+def posts_view(request):
+
+    stats = posts_per_user()
+
+    return render(
+        request,
+        "external_data/posts.html",
+        {
+            "stats": stats.items()
         }
     )
