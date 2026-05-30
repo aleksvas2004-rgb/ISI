@@ -9,5 +9,10 @@ urlpatterns = [
     path(
         "posts/",
         views.posts_view
+    ),
+    path(
+    "api/weather-summary/",
+    views.weather_summary_api
     )
+    
 ]

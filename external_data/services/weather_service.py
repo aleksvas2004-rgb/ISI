@@ -49,3 +49,15 @@ def generate_chart(times, temperatures, filename):
     plt.savefig(filename)
 
     plt.close()
+def get_weather_summary(latitude, longitude):
+
+    data = get_weather(latitude, longitude)
+
+    times = data["times"][:24]
+    temps = data["temperatures"][:24]
+
+    return {
+        "times": times,
+        "temperatures": temps,
+        "current_temp": temps[0]
+    }

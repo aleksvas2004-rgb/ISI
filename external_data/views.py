@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render
-
+from django.http import JsonResponse
 import os
-
+from .services.weather_service import get_weather_summary
 from .services.jsonplaceholder_service import posts_per_user
 
 from .services.weather_service import (
@@ -54,3 +54,23 @@ def posts_view(request):
             "stats": stats.items()
         }
     )
+def weather_summary_api(request):
+    latitude = 54.3520
+    longitude = 18.6466
+
+    weather = get_weather_summary(latitude, longitude)
+
+    temps = weather["temperatures"]
+
+    avg_temp = (
+        sum(temps)
+        / len(temps)
+    )
+
+    return JsonResponse({
+        "average_temperature":
+            round(avg_temp, 2),
+
+        "current_temperature":
+            weather["current_temp"]
+    })
