@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base',
     'blog',
+    'external_data',
 ]
 
 MIDDLEWARE = [
@@ -101,7 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
