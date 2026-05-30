@@ -1,0 +1,43 @@
+from django.conf import settings
+from django.shortcuts import render
+
+import os
+
+from .services.weather_service import (
+    get_weather,
+    generate_chart,
+)
+
+
+def weather_view(request):
+
+    latitude = 54.3520
+    longitude = 18.6466
+
+    weather = get_weather(
+        latitude,
+        longitude
+    )
+
+    chart_path = os.path.join(
+        settings.BASE_DIR,
+        "media",
+        "weather_chart.png"
+    )
+
+    generate_chart(
+        weather["times"],
+        weather["temperatures"],
+        chart_path
+    )
+
+    return render(
+        request,
+        "external_data/weather.html",
+        {
+            "current_temp":
+                weather["current_temperature"],
+            "chart":
+                "/media/weather_chart.png"
+        }
+    )
