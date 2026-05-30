@@ -3,6 +3,8 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+import requests
+
 def get_weather(latitude, longitude):
     url = (
         "https://api.open-meteo.com/v1/forecast"
@@ -12,24 +14,46 @@ def get_weather(latitude, longitude):
         "&forecast_days=1"
     )
 
-    response = requests.get(url)
-    response.raise_for_status()
+    try:
+        response = requests.get(url, timeout=5)
 
-    data = response.json()
-    times = [
-    t.split("T")[1]  
-    for t in data["hourly"]["time"][:24]
-]
-   
-    temperatures = data["hourly"]["temperature_2m"][:24]
+        # sprawdzenie kodu HTTP
+        if response.status_code != 200:
+            return {
+                "error": "API error",
+                "status_code": response.status_code
+            }
 
-    return {
-        "times": times,
-        "temperatures": temperatures,
-        "current_temperature": temperatures[0]
-    }
+        data = response.json()
 
+        times = [
+            t.split("T")[1]
+            for t in data["hourly"]["time"][:24]
+        ]
 
+        temperatures = data["hourly"]["temperature_2m"][:24]
+
+        return {
+            "times": times,
+            "temperatures": temperatures,
+            "current_temperature": temperatures[0]
+        }
+
+    except requests.exceptions.Timeout:
+        return {
+            "error": "Request timeout"
+        }
+
+    except requests.exceptions.ConnectionError:
+        return {
+            "error": "Connection error"
+        }
+
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": "Request failed",
+            "details": str(e)
+        }
 
 
 
@@ -49,6 +73,7 @@ def generate_chart(times, temperatures, filename):
     plt.savefig(filename)
 
     plt.close()
+
 def get_weather_summary(latitude, longitude):
 
     data = get_weather(latitude, longitude)
