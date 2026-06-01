@@ -73,7 +73,7 @@ def generate_chart(times, temperatures, filename):
     plt.savefig(filename)
 
     plt.close()
-
+  
 def get_weather_summary(latitude, longitude):
 
     data = get_weather(latitude, longitude)
