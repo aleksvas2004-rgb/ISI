@@ -1,9 +1,8 @@
 import requests
 import matplotlib
 matplotlib.use("Agg")
-
 import matplotlib.pyplot as plt
-import requests
+
 
 def get_weather(latitude, longitude):
     url = (
@@ -17,7 +16,6 @@ def get_weather(latitude, longitude):
     try:
         response = requests.get(url, timeout=5)
 
-        # sprawdzenie kodu HTTP
         if response.status_code != 200:
             return {
                 "error": "API error",
@@ -26,63 +24,63 @@ def get_weather(latitude, longitude):
 
         data = response.json()
 
-        times = [
-            t.split("T")[1]
-            for t in data["hourly"]["time"][:24]
-        ]
+        hourly = data.get("hourly", {})
+        times_raw = hourly.get("time", [])
+        temps_raw = hourly.get("temperature_2m", [])
 
-        temperatures = data["hourly"]["temperature_2m"][:24]
+        if not times_raw or not temps_raw:
+            return {"error": "Missing hourly data from API"}
+
+        times = [t.split("T")[1] for t in times_raw[:24]]
+        temperatures = temps_raw[:24]
 
         return {
             "times": times,
             "temperatures": temperatures,
-            "current_temperature": temperatures[0]
+            "current_temperature": temperatures[0] if temperatures else None
         }
 
     except requests.exceptions.Timeout:
-        return {
-            "error": "Request timeout"
-        }
+        return {"error": "Request timeout"}
 
     except requests.exceptions.ConnectionError:
-        return {
-            "error": "Connection error"
-        }
+        return {"error": "Connection error"}
 
     except requests.exceptions.RequestException as e:
         return {
             "error": "Request failed",
             "details": str(e)
         }
-
-
-
-def generate_chart(times, temperatures, filename):
-    plt.figure(figsize=(10, 4))
-
-    plt.plot(times, temperatures)
-
-    plt.title("Temperatura - najbliższe 24h")
-    plt.xlabel("Czas")
-    plt.ylabel("°C")
-
-    plt.xticks(rotation=45)
-
-    plt.tight_layout()
-
-    plt.savefig(filename)
-
-    plt.close()
-
 def get_weather_summary(latitude, longitude):
-
     data = get_weather(latitude, longitude)
 
-    times = data["times"][:24]
-    temps = data["temperatures"][:24]
+    if "error" in data:
+        return data
+
+    times = data.get("times", [])
+    temps = data.get("temperatures", [])
+
+    if not times or not temps:
+        return {"error": "Empty weather data"}
 
     return {
         "times": times,
         "temperatures": temps,
         "current_temp": temps[0]
     }
+
+def generate_chart(times, temperatures, filename):
+    if not times or not temperatures:
+        return {"error": "No data for chart"}
+
+    plt.figure(figsize=(10, 4))
+    plt.plot(times, temperatures)
+
+    plt.title("Temperatura - najbliższe 24h")
+    plt.xlabel("Czas")
+    plt.ylabel("°C")
+    plt.xticks(rotation=45)
+
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close()
