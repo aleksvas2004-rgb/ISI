@@ -16,10 +16,9 @@ def get_weather(latitude, longitude):
     response = requests.get(url, timeout=5)
 
     if response.status_code != 200:
-        return {"error": "API error", "status_code": response.status_code}
+        return {"error": "API error"}
 
     data = response.json()
-
     hourly = data.get("hourly", {})
 
     times = hourly.get("time", [])
@@ -30,32 +29,26 @@ def get_weather(latitude, longitude):
         "temperatures": temps[:24],
         "current_temperature": temps[0] if temps else None
     }
+
+
 def get_weather_summary(latitude, longitude):
     data = get_weather(latitude, longitude)
 
     if "error" in data:
         return data
 
-    times = data.get("times", [])
-    temps = data.get("temperatures", [])
-
-    if not times or not temps:
-        return {"error": "Empty weather data"}
-
     return {
-        "times": times,
-        "temperatures": temps,
-        "current_temp": temps[0]
+        "times": data.get("times", []),
+        "temperatures": data.get("temperatures", []),
+        "current_temp": data.get("current_temperature")
     }
 
-def generate_chart(times, temperatures, filename):
-    if not times or not temperatures:
-        return {"error": "No data for chart"}
 
+def generate_chart(times, temperatures, filename):
     plt.figure(figsize=(10, 4))
     plt.plot(times, temperatures)
 
-    plt.title("Temperatura - najbliższe 24h")
+    plt.title("Temperatura - 24h")
     plt.xlabel("Czas")
     plt.ylabel("°C")
     plt.xticks(rotation=45)
