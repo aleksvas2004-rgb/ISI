@@ -12,37 +12,27 @@ from .services.weather_service import (
 
 
 def weather_view(request):
+    latitude = request.GET.get("lat", 54.352)   # Gdańsk fallback
+    longitude = request.GET.get("lon", 18.6466)
 
-    latitude = 54.3520
-    longitude = 18.6466
+    weather = get_weather(latitude, longitude)
 
-    weather = get_weather(
-        latitude,
-        longitude
-    )
+    
+    if "error" in weather:
+        return render(request, "external_data/weather.html", {
+            "error": weather["error"],
+            "status_code": weather.get("status_code"),
+        })
 
-    chart_path = os.path.join(
-        settings.BASE_DIR,
-        "media",
-        "weather_chart.png"
-    )
 
-    generate_chart(
-        weather["times"],
-        weather["temperatures"],
-        chart_path
-    )
+    times = weather.get("times", [])
+    temperatures = weather.get("temperatures", [])
 
-    return render(
-        request,
-        "external_data/weather.html",
-        {
-            "current_temp":
-                weather["current_temperature"],
-            "chart":
-                "/media/weather_chart.png"
-        }
-    )
+    return render(request, "external_data/weather.html", {
+        "times": times,
+        "temperatures": temperatures,
+        "current_temperature": weather.get("current_temperature"),
+    })
 def posts_view(request):
 
     stats = posts_per_user()
