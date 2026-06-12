@@ -20,13 +20,13 @@ def weather_view(request):
     weather = get_weather(latitude, longitude)
 
     if "error" in weather:
-        return render(request, "weather.html", {"error": weather["error"]})
+        return render(request, "external_data/weather.html", {"error": weather["error"]})
 
     times = weather.get("times", [])
     temperatures = weather.get("temperatures", [])
 
     if not times or not temperatures:
-        return render(request, "weather.html", {"error": "Brak danych"})
+        return render(request, "external_data/weather.html", {"error": "Brak danych"})
 
     # 🔥 KLUCZOWA POPRAWKA
     os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
