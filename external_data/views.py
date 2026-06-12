@@ -3,14 +3,13 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import os
 
-from .services.weather_service import get_weather_summary
-from .services.jsonplaceholder_service import posts_per_user
-
 from .services.weather_service import (
     get_weather,
     generate_chart,
+    get_weather_summary,
 )
 
+from .services.jsonplaceholder_service import posts_per_user
 
 
 def weather_view(request):
@@ -20,15 +19,19 @@ def weather_view(request):
     weather = get_weather(latitude, longitude)
 
     if "error" in weather:
-        return render(request, "external_data/weather.html", {"error": weather["error"]})
+        return render(request, "external_data/weather.html", {
+            "error": weather["error"]
+        })
 
     times = weather.get("times", [])
     temperatures = weather.get("temperatures", [])
 
     if not times or not temperatures:
-        return render(request, "external_data/weather.html", {"error": "Brak danych"})
+        return render(request, "external_data/weather.html", {
+            "error": "Brak danych"
+        })
 
-    # 🔥 KLUCZOWA POPRAWKA
+    # MEDIA FOLDER (Render-safe)
     os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
 
     filename = "weather_chart.png"
@@ -42,17 +45,16 @@ def weather_view(request):
         "temperatures": temperatures,
         "chart_url": settings.MEDIA_URL + filename
     })
-def posts_view(request):
 
+
+def posts_view(request):
     stats = posts_per_user()
 
-    return render(
-        request,
-        "external_data/posts.html",
-        {
-            "stats": stats.items()
-        }
-    )
+    return render(request, "external_data/posts.html", {
+        "stats": stats.items()
+    })
+
+
 def weather_summary_api(request):
     latitude = 54.3520
     longitude = 18.6466
