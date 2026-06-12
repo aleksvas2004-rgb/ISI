@@ -2,6 +2,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
 import os
+
 from .services.weather_service import get_weather_summary
 from .services.jsonplaceholder_service import posts_per_user
 
@@ -11,27 +12,35 @@ from .services.weather_service import (
 )
 
 
+
 def weather_view(request):
-    latitude = request.GET.get("lat", 54.352)   # Gdańsk fallback
-    longitude = request.GET.get("lon", 18.6466)
+    latitude = 54.34
+    longitude = 18.66
 
     weather = get_weather(latitude, longitude)
 
-    
     if "error" in weather:
-        return render(request, "external_data/weather.html", {
-            "error": weather["error"],
-            "status_code": weather.get("status_code"),
-        })
-
+        return render(request, "weather.html", {"error": weather["error"]})
 
     times = weather.get("times", [])
     temperatures = weather.get("temperatures", [])
 
+    if not times or not temperatures:
+        return render(request, "weather.html", {"error": "Brak danych"})
+
+    # 🔥 KLUCZOWA POPRAWKA
+    os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+
+    filename = "weather_chart.png"
+    chart_path = os.path.join(settings.MEDIA_ROOT, filename)
+
+    generate_chart(times, temperatures, chart_path)
+
     return render(request, "external_data/weather.html", {
+        "current_temp": weather.get("current_temperature"),
         "times": times,
         "temperatures": temperatures,
-        "current_temperature": weather.get("current_temperature"),
+        "chart_url": settings.MEDIA_URL + filename
     })
 def posts_view(request):
 
