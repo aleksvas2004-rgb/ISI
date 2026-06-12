@@ -13,44 +13,23 @@ def get_weather(latitude, longitude):
         "&forecast_days=1"
     )
 
-    try:
-        response = requests.get(url, timeout=5)
+    response = requests.get(url, timeout=5)
 
-        if response.status_code != 200:
-            return {
-                "error": "API error",
-                "status_code": response.status_code
-            }
+    if response.status_code != 200:
+        return {"error": "API error", "status_code": response.status_code}
 
-        data = response.json()
+    data = response.json()
 
-        hourly = data.get("hourly", {})
-        times_raw = hourly.get("time", [])
-        temps_raw = hourly.get("temperature_2m", [])
+    hourly = data.get("hourly", {})
 
-        if not times_raw or not temps_raw:
-            return {"error": "Missing hourly data from API"}
+    times = hourly.get("time", [])
+    temps = hourly.get("temperature_2m", [])
 
-        times = [t.split("T")[1] for t in times_raw[:24]]
-        temperatures = temps_raw[:24]
-
-        return {
-            "times": times,
-            "temperatures": temperatures,
-            "current_temperature": temperatures[0] if temperatures else None
-        }
-
-    except requests.exceptions.Timeout:
-        return {"error": "Request timeout"}
-
-    except requests.exceptions.ConnectionError:
-        return {"error": "Connection error"}
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "error": "Request failed",
-            "details": str(e)
-        }
+    return {
+        "times": [t.split("T")[1] for t in times[:24]],
+        "temperatures": temps[:24],
+        "current_temperature": temps[0] if temps else None
+    }
 def get_weather_summary(latitude, longitude):
     data = get_weather(latitude, longitude)
 
