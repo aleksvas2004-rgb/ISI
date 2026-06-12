@@ -4,6 +4,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
+import requests
+
 def get_weather(latitude, longitude):
     url = (
         "https://api.open-meteo.com/v1/forecast"
@@ -13,22 +15,26 @@ def get_weather(latitude, longitude):
         "&forecast_days=1"
     )
 
-    response = requests.get(url, timeout=5)
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
 
-    if response.status_code != 200:
-        return {"error": "API error", "status_code": response.status_code}
-
-    data = response.json()
+    except Exception as e:
+        return {"error": str(e)}
 
     hourly = data.get("hourly", {})
 
     times = hourly.get("time", [])
     temps = hourly.get("temperature_2m", [])
 
+    if not times or not temps:
+        return {"error": "Empty API data"}
+
     return {
         "times": [t.split("T")[1] for t in times[:24]],
         "temperatures": temps[:24],
-        "current_temperature": temps[0] if temps else None
+        "current_temperature": temps[0]
     }
 def get_weather_summary(latitude, longitude):
     data = get_weather(latitude, longitude)

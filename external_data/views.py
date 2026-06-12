@@ -59,17 +59,17 @@ def weather_summary_api(request):
 
     weather = get_weather_summary(latitude, longitude)
 
-    temps = weather["temperatures"]
+    if "error" in weather:
+        return JsonResponse({"error": weather["error"]}, status=500)
 
-    avg_temp = (
-        sum(temps)
-        / len(temps)
-    )
+    temps = weather.get("temperatures", [])
+
+    if not temps:
+        return JsonResponse({"error": "No temperature data"}, status=500)
+
+    avg_temp = sum(temps) / len(temps)
 
     return JsonResponse({
-        "average_temperature":
-            round(avg_temp, 2),
-
-        "current_temperature":
-            weather["current_temp"]
+        "average_temperature": round(avg_temp, 2),
+        "current_temperature": weather.get("current_temp")
     })
