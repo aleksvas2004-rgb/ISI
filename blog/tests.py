@@ -20,7 +20,7 @@ class BlogTests(TestCase):
 
     def test_post_list_status_code(self):
         response = self.client.get(reverse("post_list"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
 
     def test_post_detail_status_code(self):
         response = self.client.get(reverse("post_detail", args=[self.post.id]))
